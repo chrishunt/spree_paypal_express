@@ -187,16 +187,17 @@ module Spree
       return unless (params[:state] == "payment")
       return unless params[:order][:payments_attributes]
 
-      if @order.update_attributes(object_params)
-        if params[:order][:coupon_code] and !params[:order][:coupon_code].blank? and @order.coupon_code.present?
-          fire_event('spree.checkout.coupon_code_added', :coupon_code => @order.coupon_code)
-        end
-      end
-
-      load_order
       payment_method = Spree::PaymentMethod.find(params[:order][:payments_attributes].first[:payment_method_id])
 
       if payment_method.kind_of?(Spree::BillingIntegration::PaypalExpress) || payment_method.kind_of?(Spree::BillingIntegration::PaypalExpressUk)
+        if @order.update_attributes(object_params)
+          if params[:order][:coupon_code] and !params[:order][:coupon_code].blank? and @order.coupon_code.present?
+            fire_event('spree.checkout.coupon_code_added', :coupon_code => @order.coupon_code)
+          end
+        end
+
+        load_order
+
         redirect_to(paypal_payment_order_checkout_url(@order, :payment_method_id => payment_method.id)) and return
       end
     end
