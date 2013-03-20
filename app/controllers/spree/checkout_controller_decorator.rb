@@ -236,7 +236,7 @@ module Spree
     end
 
     def user_locale
-      I18n.locale.to_s
+      'US'
     end
 
     # hook to override paypal site options
